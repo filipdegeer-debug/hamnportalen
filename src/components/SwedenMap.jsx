@@ -1,12 +1,11 @@
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
-import { ports } from '../data/ports'
 import { getPortMarkerIcon } from '../utils/portMarkerIcon'
 
 const SWEDEN_CENTER = [62.5, 16.5]
 const SWEDEN_ZOOM = 5
 
-function SwedenMap() {
+function SwedenMap({ ports, onSelectPort }) {
   return (
     <MapContainer
       center={SWEDEN_CENTER}
@@ -24,6 +23,9 @@ function SwedenMap() {
           key={port.hamnanlaggning}
           position={[port.latitud, port.longitud]}
           icon={getPortMarkerIcon(port.kund)}
+          eventHandlers={{
+            click: () => onSelectPort(port),
+          }}
         >
           <Popup>
             <strong>{port.namn}</strong>
