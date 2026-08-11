@@ -1,4 +1,5 @@
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet'
+import { useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { getPortMarkerIcon } from '../utils/portMarkerIcon'
 
@@ -8,13 +9,47 @@ const SWEDEN_ZOOM = 5
 function FlyToPort({ port }) {
   const map = useMap()
 
-  if (port) {
-    map.flyTo([port.latitud, port.longitud], 9, {
-      duration: 1.2,
-    })
-  }
+  useEffect(() => {
+    if (port) {
+      map.flyTo([port.latitud, port.longitud], 9, {
+        duration: 1.2,
+      })
+    }
+  }, [port, map])
 
   return null
+}
+
+function PortMarker({ port, selectedPort, onSelectPort }) {
+  const markerRef = useRef(null)
+
+  useEffect(() => {
+    if (
+      selectedPort &&
+      selectedPort.hamnanlaggning === port.hamnanlaggning
+    ) {
+      markerRef.current?.openPopup()
+    }
+  }, [selectedPort, port])
+
+  return (
+    <Marker
+      ref={markerRef}
+      position={[port.latitud, port.longitud]}
+      icon={getPortMarkerIcon(port.kund)}
+      eventHandlers={{
+        click: () => onSelectPort(port),
+      }}
+    >
+      <Popup>
+        <strong>{port.namn}</strong>
+        <br />
+        Hamnanläggning: {port.hamnanlaggning}
+        <br />
+        Kund: {port.kund ? 'Ja' : 'Nej'}
+      </Popup>
+    </Marker>
+  )
 }
 
 function SwedenMap({ ports, selectedPort, onSelectPort }) {
@@ -33,22 +68,12 @@ function SwedenMap({ ports, selectedPort, onSelectPort }) {
       <FlyToPort port={selectedPort} />
 
       {ports.map((port) => (
-        <Marker
+        <PortMarker
           key={port.hamnanlaggning}
-          position={[port.latitud, port.longitud]}
-          icon={getPortMarkerIcon(port.kund)}
-          eventHandlers={{
-            click: () => onSelectPort(port),
-          }}
-        >
-          <Popup>
-            <strong>{port.namn}</strong>
-            <br />
-            Hamnanläggning: {port.hamnanlaggning}
-            <br />
-            Kund: {port.kund ? 'Ja' : 'Nej'}
-          </Popup>
-        </Marker>
+          port={port}
+          selectedPort={selectedPort}
+          onSelectPort={onSelectPort}
+        />
       ))}
     </MapContainer>
   )
