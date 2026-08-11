@@ -1,0 +1,33 @@
+export const ports = [
+  {
+    namn: 'Sundsvall Oljehamn',
+    hamnanlaggning: 'SEDTS003',
+    latitud: 62.385458,
+    longitud: 17.352456,
+    kund: true,
+    stad: 'Sundsvall',
+    pfso: '',
+    gisis: '',
+    cer: false,
+    nis2: false,
+    senasteRevision: '',
+    nastaRevision: '',
+    dokument: [],
+  },
+
+  {
+    namn: 'Testhamn',
+    hamnanlaggning: 'TEST001',
+    latitud: 57.7089,
+    longitud: 11.9746,
+    kund: false,
+    stad: 'Göteborg',
+    pfso: '',
+    gisis: '',
+    cer: false,
+    nis2: false,
+    senasteRevision: '',
+    nastaRevision: '',
+    dokument: [],
+  },
+]
