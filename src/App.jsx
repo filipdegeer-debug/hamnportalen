@@ -9,70 +9,103 @@ import './App.css'
 const ports = getAllPorts()
 
 function App() {
+
   const [selectedPort, setSelectedPort] = useState(null)
+
+  const [mapFocusPort, setMapFocusPort] = useState(null)
+
   const [searchText, setSearchText] = useState('')
-  const [lockedSelection, setLockedSelection] = useState(false)
 
   const search = normalizeSearch(searchText)
 
   const filteredPorts = ports.filter((port) => {
+
     return (
+
       normalizeSearch(port.id).includes(search) ||
+
       normalizeSearch(port.hamnNamn).includes(search) ||
+
       normalizeSearch(port.hamnanlaggningNamn).includes(search) ||
+
       normalizeSearch(port.operatör).includes(search)
+
     )
+
   })
 
   function selectPort(port) {
+
     setSelectedPort(port)
-    setSearchText(port.hamnanlaggningNamn)
-    setLockedSelection(true)
+
+    setMapFocusPort(port)
+
   }
 
   function updateSearch(text) {
+
     setSearchText(text)
 
     if (text === '') {
-      setLockedSelection(false)
+
+      setMapFocusPort(null)
+
       setSelectedPort(null)
+
     }
+
   }
 
-  let visiblePorts
+  const visiblePorts =
 
-  if (lockedSelection && selectedPort) {
-    visiblePorts = [selectedPort]
-  } else if (searchText.trim() === '') {
-    visiblePorts = ports
-  } else {
-    visiblePorts = filteredPorts
-  }
+    searchText.trim() === ''
+
+      ? ports
+
+      : filteredPorts
 
   return (
+
     <main className="app">
 
       <section className="map-panel">
 
         <SearchBox
+
           searchText={searchText}
+
           setSearchText={updateSearch}
+
           filteredPorts={filteredPorts}
+
           onSelectPort={selectPort}
+
         />
 
         <SwedenMap
+
           ports={visiblePorts}
+
           selectedPort={selectedPort}
+
+          mapFocusPort={mapFocusPort}
+
           onSelectPort={selectPort}
+
         />
 
       </section>
 
-      <InfoPanel port={selectedPort} />
+      <InfoPanel
+
+        port={selectedPort}
+
+      />
 
     </main>
+
   )
+
 }
 
 export default App

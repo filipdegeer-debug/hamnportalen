@@ -1,31 +1,60 @@
-import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet'
+import {
+  MapContainer,
+  Marker,
+  Popup,
+  TileLayer,
+  useMap,
+} from 'react-leaflet'
 import { useEffect, useRef } from 'react'
+import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+
 import { getPortMarkerIcon } from '../utils/portMarkerIcon'
 
 const SWEDEN_CENTER = [62.5, 16.5]
 const SWEDEN_ZOOM = 5
-const PORT_ZOOM = 15
+const PORT_ZOOM = 13
 
-function FlyToPort({ port }) {
+function MapController({ ports, mapFocusPort }) {
   const map = useMap()
 
   useEffect(() => {
-    if (port) {
+    if (ports.length === 0) return
+
+    // Om användaren har valt en hamnanläggning
+    if (mapFocusPort) {
       map.flyTo(
-        [port.latitud, port.longitud],
+        [mapFocusPort.latitud, mapFocusPort.longitud],
         PORT_ZOOM,
         {
-          duration: 1.2,
+          duration: 1.1,
         }
       )
+      return
     }
-  }, [port, map])
+
+    // Om flera hamnar visas (t.ex. sökning på Göteborg)
+    if (ports.length > 1) {
+      const bounds = L.latLngBounds(
+        ports.map((port) => [port.latitud, port.longitud])
+      )
+
+      map.flyToBounds(bounds, {
+        padding: [50, 50],
+        maxZoom: PORT_ZOOM,
+        duration: 1.2,
+      })
+    }
+  }, [ports, mapFocusPort, map])
 
   return null
 }
 
-function PortMarker({ port, selectedPort, onSelectPort }) {
+function PortMarker({
+  port,
+  selectedPort,
+  onSelectPort,
+}) {
   const markerRef = useRef(null)
 
   useEffect(() => {
@@ -59,13 +88,20 @@ function PortMarker({ port, selectedPort, onSelectPort }) {
 
         <br />
 
-        {port.ncmKund ? '🟢 NCM-kund' : '🔴 Ej kund'}
+        {port.ncmKund
+          ? '🟢 NCM-kund'
+          : '🔴 Ej kund'}
       </Popup>
     </Marker>
   )
 }
 
-function SwedenMap({ ports, selectedPort, onSelectPort }) {
+function SwedenMap({
+  ports,
+  selectedPort,
+  mapFocusPort,
+  onSelectPort,
+}) {
   return (
     <MapContainer
       center={SWEDEN_CENTER}
@@ -78,7 +114,10 @@ function SwedenMap({ ports, selectedPort, onSelectPort }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      <FlyToPort port={selectedPort} />
+      <MapController
+        ports={ports}
+        mapFocusPort={mapFocusPort}
+      />
 
       {ports.map((port) => (
         <PortMarker
