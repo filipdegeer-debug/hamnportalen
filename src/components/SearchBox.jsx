@@ -8,31 +8,49 @@ function SearchBox({
 }) {
   return (
     <div className="search-box">
+
       <input
         className="search-input"
         type="text"
-        placeholder="🔍 Sök hamn..."
+        placeholder="🔍 Sök hamn, hamnanläggning eller IMO..."
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
       />
 
-      {searchText !== '' && (
+      {searchText.trim() !== '' && (
         <div className="search-results">
+
+          {filteredPorts.length === 0 && (
+            <div className="search-result">
+              Ingen träff
+            </div>
+          )}
+
           {filteredPorts.map((port) => (
+
             <div
-              key={port.hamnanlaggning}
+              key={port.id}
               className="search-result"
               onClick={() => onSelectPort(port)}
             >
-              <strong>{port.namn}</strong>
+
+              <strong>{port.hamnanlaggningNamn}</strong>
+
               <br />
-              <small>
-                {port.stad} • {port.hamnanlaggning}
-              </small>
+
+              <small>{port.hamnNamn}</small>
+
+              <br />
+
+              <small>{port.id}</small>
+
             </div>
+
           ))}
+
         </div>
       )}
+
     </div>
   )
 }

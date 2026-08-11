@@ -5,15 +5,20 @@ import { getPortMarkerIcon } from '../utils/portMarkerIcon'
 
 const SWEDEN_CENTER = [62.5, 16.5]
 const SWEDEN_ZOOM = 5
+const PORT_ZOOM = 15
 
 function FlyToPort({ port }) {
   const map = useMap()
 
   useEffect(() => {
     if (port) {
-      map.flyTo([port.latitud, port.longitud], 9, {
-        duration: 1.2,
-      })
+      map.flyTo(
+        [port.latitud, port.longitud],
+        PORT_ZOOM,
+        {
+          duration: 1.2,
+        }
+      )
     }
   }, [port, map])
 
@@ -26,7 +31,7 @@ function PortMarker({ port, selectedPort, onSelectPort }) {
   useEffect(() => {
     if (
       selectedPort &&
-      selectedPort.hamnanlaggning === port.hamnanlaggning
+      selectedPort.id === port.id
     ) {
       markerRef.current?.openPopup()
     }
@@ -36,17 +41,25 @@ function PortMarker({ port, selectedPort, onSelectPort }) {
     <Marker
       ref={markerRef}
       position={[port.latitud, port.longitud]}
-      icon={getPortMarkerIcon(port.kund)}
+      icon={getPortMarkerIcon(port.ncmKund)}
       eventHandlers={{
         click: () => onSelectPort(port),
       }}
     >
       <Popup>
-        <strong>{port.namn}</strong>
+        <strong>{port.hamnNamn}</strong>
+
         <br />
-        Hamnanläggning: {port.hamnanlaggning}
+
+        {port.hamnanlaggningNamn}
+
         <br />
-        Kund: {port.kund ? 'Ja' : 'Nej'}
+
+        {port.id}
+
+        <br />
+
+        {port.ncmKund ? '🟢 NCM-kund' : '🔴 Ej kund'}
       </Popup>
     </Marker>
   )
@@ -61,7 +74,7 @@ function SwedenMap({ ports, selectedPort, onSelectPort }) {
       className="sweden-map"
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution="&copy; OpenStreetMap contributors"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
@@ -69,7 +82,7 @@ function SwedenMap({ ports, selectedPort, onSelectPort }) {
 
       {ports.map((port) => (
         <PortMarker
-          key={port.hamnanlaggning}
+          key={port.id}
           port={port}
           selectedPort={selectedPort}
           onSelectPort={onSelectPort}
