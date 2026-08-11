@@ -1,16 +1,41 @@
-# React + Vite
+```
+# Hamnportalen
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Hamnportalen är ett React-projekt för att hantera svenska hamnanläggningar.
 
-Currently, two official plugins are available:
+## Funktioner
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Interaktiv karta över Sverige
+- Hamninformation
+- Kundmarkeringar
+- Dokumenthantering (kommer)
+- GISIS (kommer)
+- CER/NIS2 (kommer)
 
-## React Compiler
+## Teknik
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React
+- Vite
+- Leaflet
+- Git
+- GitHub
 
-## Expanding the Oxlint configuration
+## Starta projektet
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Installera beroenden:
+
+```bash
+npm install
+```
+
+Starta utvecklingsservern:
+
+```bash
+npm run dev
+```
+
+Öppna sedan:
+
+http://localhost:5173
+```
+
