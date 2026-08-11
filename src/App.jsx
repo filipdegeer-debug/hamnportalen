@@ -12,6 +12,7 @@ function App() {
       <section className="map-panel">
         <SwedenMap
           ports={ports}
+          selectedPort={selectedPort}
           onSelectPort={setSelectedPort}
         />
       </section>

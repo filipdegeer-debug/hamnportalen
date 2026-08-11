@@ -1,11 +1,23 @@
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
+import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { getPortMarkerIcon } from '../utils/portMarkerIcon'
 
 const SWEDEN_CENTER = [62.5, 16.5]
 const SWEDEN_ZOOM = 5
 
-function SwedenMap({ ports, onSelectPort }) {
+function FlyToPort({ port }) {
+  const map = useMap()
+
+  if (port) {
+    map.flyTo([port.latitud, port.longitud], 9, {
+      duration: 1.2,
+    })
+  }
+
+  return null
+}
+
+function SwedenMap({ ports, selectedPort, onSelectPort }) {
   return (
     <MapContainer
       center={SWEDEN_CENTER}
@@ -17,6 +29,8 @@ function SwedenMap({ ports, onSelectPort }) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+
+      <FlyToPort port={selectedPort} />
 
       {ports.map((port) => (
         <Marker
