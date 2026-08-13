@@ -1,104 +1,245 @@
+import { useState, useEffect } from 'react'
+
+import { useCustomData } from '../context/CustomDataContext'
+
+import InfoTabs from './InfoTabs'
+import EditPanel from './EditPanel'
+
 function InfoPanel({ port }) {
+
+  const { updatePort } = useCustomData()
+
+  const [activeTab, setActiveTab] = useState('info')
+
+  const [isCustomer, setIsCustomer] = useState(false)
+  const [operator, setOperator] = useState('')
+  const [latitude, setLatitude] = useState('')
+  const [longitude, setLongitude] = useState('')
+
+  const [pfso, setPfso] = useState('')
+  const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
+
+  const [submitted, setSubmitted] = useState('')
+  const [approvedUntil, setApprovedUntil] = useState('')
+
+  const [notes, setNotes] = useState('')
+  const [documents, setDocuments] = useState([])
+
+  useEffect(() => {
+
+    if (!port) return
+
+    setActiveTab('info')
+
+    setIsCustomer(port.ncmKund)
+    setOperator(port.operatör || '')
+    setLatitude(port.latitud)
+    setLongitude(port.longitud)
+
+    setPfso(port.pfso || '')
+    setPhone(port.pfsoTelefon || '')
+    setEmail(port.pfsoEmail || '')
+
+    setSubmitted(port.pfspInskickad || '')
+    setApprovedUntil(port.pfspGodkandTill || '')
+
+    setNotes(port.anteckningar || '')
+    setDocuments(port.dokument || [])
+
+  }, [port])
+
   if (!port) {
     return (
       <aside className="info-panel">
-        <p>Välj en hamn på kartan.</p>
+        <p>Välj en hamnanläggning på kartan.</p>
       </aside>
     )
   }
 
+  function saveChanges() {
+
+    updatePort(port.id, {
+
+      ncmKund: isCustomer,
+      operatör: operator,
+
+      latitud: Number(latitude),
+      longitud: Number(longitude),
+
+      pfso,
+      pfsoTelefon: phone,
+      pfsoEmail: email,
+
+      pfspInskickad: submitted,
+      pfspGodkandTill: approvedUntil,
+
+      anteckningar: notes,
+
+      dokument: documents,
+
+    })
+
+    alert('Ändringarna sparades i minnet.')
+
+  }
+
   return (
+
     <aside className="info-panel">
-      <h2>{port.namn}</h2>
+
+      <h2>{port.hamnNamn}</h2>
 
       <p>
-        <strong>{port.hamnanlaggning}</strong>
+        <strong>{port.hamnanlaggningNamn}</strong>
       </p>
 
-      <p>{port.kund ? '🟢 NCM-kund' : '🔴 Ej NCM-kund'}</p>
-
-      <hr />
-
-      <h3>📍 Grunddata</h3>
-
-      <p><strong>Operatör</strong></p>
-      <p>{port.operatör || '-'}</p>
-
-      <p><strong>Adress</strong></p>
-      <p style={{ whiteSpace: 'pre-line' }}>
-        {port.gatuadress || '-'}
+      <p
+        style={{
+          color: isCustomer ? '#1b8f3a' : '#c62828',
+          fontWeight: 'bold',
+          fontSize: '18px',
+        }}
+      >
+        {isCustomer ? '🟢 NCM-kund' : '🔴 Ej NCM-kund'}
       </p>
 
-      <p><strong>GISIS</strong></p>
-      <p>{port.gisis || '-'}</p>
+      <InfoTabs
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
 
-      <hr />
+      {activeTab === 'info' && (
 
-      <h3>🛡 Säkerhet</h3>
+        <>
 
-      <p><strong>Skyddsnivå</strong></p>
-      <p>{port.skyddsniva}</p>
+          <h3>📍 Grunddata</h3>
 
-      <hr />
+          <p><strong>GISIS-ID</strong></p>
+          <p>{port.id}</p>
 
-      <h3>👤 Kontakt</h3>
+          <p><strong>Operatör</strong></p>
+          <p>{operator || '-'}</p>
 
-      <p><strong>PFSO</strong></p>
-      <p>{port.pfso || '-'}</p>
+          <p><strong>Adress</strong></p>
+          <p>{port.gatuadress || '-'}</p>
 
-      <p><strong>Telefon</strong></p>
-      <p>{port.pfsoTelefon || '-'}</p>
+          <hr />
 
-      <p><strong>E-post</strong></p>
-      <p>{port.pfsoEmail || '-'}</p>
+          <h3>👤 Kontakt</h3>
 
-      <hr />
+          <p><strong>PFSO</strong></p>
+          <p>{pfso || '-'}</p>
 
-      <h3>📄 PFSP</h3>
+          <p><strong>Telefon</strong></p>
+          <p>{phone || '-'}</p>
 
-      <p><strong>Inskickad</strong></p>
-      <p>{port.pfspInskickad || '-'}</p>
+          <p><strong>E-post</strong></p>
+          <p>{email || '-'}</p>
 
-      <p><strong>Godkänd till och med</strong></p>
-      <p>{port.pfspGodkandTill || '-'}</p>
+          <hr />
 
-      <hr />
+          <h3>📄 PFSP</h3>
 
-      <h3>📂 Dokument</h3>
+          <p><strong>Inskickad</strong></p>
+          <p>{submitted || '-'}</p>
 
-      {port.dokument?.length ? (
-        <ul>
-          {port.dokument.map((doc) => (
-            <li key={doc}>{doc}</li>
-          ))}
-        </ul>
-      ) : (
-        <p>Inga dokument.</p>
+          <p><strong>Godkänd till</strong></p>
+          <p>{approvedUntil || '-'}</p>
+
+          <hr />
+
+          <h3>📝 Anteckningar</h3>
+
+          <p>{notes || 'Inga anteckningar.'}</p>
+
+        </>
+
       )}
 
-      <button style={{ marginTop: '8px' }}>
-        + Lägg till dokument
-      </button>
+      {activeTab === 'edit' && (
 
-      <hr />
+        <EditPanel
 
-      <h3>📝 Anteckningar</h3>
+          isCustomer={isCustomer}
+          setIsCustomer={setIsCustomer}
 
-      <p>{port.anteckningar || 'Inga anteckningar.'}</p>
+          operator={operator}
+          setOperator={setOperator}
 
-      <button style={{ marginTop: '8px' }}>
-        Spara anteckningar
-      </button>
+          latitude={latitude}
+          setLatitude={setLatitude}
 
-      <hr />
+          longitude={longitude}
+          setLongitude={setLongitude}
 
-      <h3>🤖 AI</h3>
+          pfso={pfso}
+          setPfso={setPfso}
 
-      <button>
-        Analysera hamnen
-      </button>
+          phone={phone}
+          setPhone={setPhone}
+
+          email={email}
+          setEmail={setEmail}
+
+          submitted={submitted}
+          setSubmitted={setSubmitted}
+
+          approvedUntil={approvedUntil}
+          setApprovedUntil={setApprovedUntil}
+
+          notes={notes}
+          setNotes={setNotes}
+
+          documents={documents}
+          setDocuments={setDocuments}
+
+          onSave={saveChanges}
+
+        />
+
+      )}
+
+      {activeTab === 'documents' && (
+
+        <>
+          <h3>📂 Dokument</h3>
+
+          {documents.length === 0
+            ? <p>Inga dokument.</p>
+            : documents.map((doc) => (
+                <p key={doc}>📄 {doc}</p>
+              ))
+          }
+        </>
+
+      )}
+
+      {activeTab === 'ai' && (
+
+        <>
+          <h3>🤖 AI-assistent</h3>
+
+          <button style={{ width: '100%', marginBottom: '10px' }}>
+            Analysera hamnanläggning
+          </button>
+
+          <button style={{ width: '100%', marginBottom: '10px' }}>
+            Sammanfatta PFSP
+          </button>
+
+          <button style={{ width: '100%' }}>
+            Kontrollera saknade uppgifter
+          </button>
+
+        </>
+
+      )}
+
     </aside>
+
   )
+
 }
 
 export default InfoPanel

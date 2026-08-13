@@ -1,9 +1,13 @@
 import { ports } from '../data/ports.generated.js'
+import { customData } from '../data/ports.custom.js'
 
 export function getAllPorts() {
-  return ports
+  return ports.map((port) => ({
+    ...port,
+    ...(customData[port.id] || {}),
+  }))
 }
 
 export function getPortById(id) {
-  return ports.find(port => port.id === id)
+  return getAllPorts().find((port) => port.id === id)
 }
