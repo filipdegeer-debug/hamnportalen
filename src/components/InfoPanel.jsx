@@ -5,8 +5,7 @@ import { useCustomData } from '../context/CustomDataContext'
 import InfoTabs from './InfoTabs'
 import EditPanel from './EditPanel'
 
-function InfoPanel({ port }) {
-
+function InfoPanel({ port, onPortSaved }) {
   const { updatePort } = useCustomData()
 
   const [activeTab, setActiveTab] = useState('info')
@@ -27,7 +26,6 @@ function InfoPanel({ port }) {
   const [documents, setDocuments] = useState([])
 
   useEffect(() => {
-
     if (!port) return
 
     setActiveTab('info')
@@ -46,7 +44,6 @@ function InfoPanel({ port }) {
 
     setNotes(port.anteckningar || '')
     setDocuments(port.dokument || [])
-
   }, [port])
 
   if (!port) {
@@ -57,10 +54,8 @@ function InfoPanel({ port }) {
     )
   }
 
-  function saveChanges() {
-
-    updatePort(port.id, {
-
+  async function saveChanges() {
+    const values = {
       ncmKund: isCustomer,
       operatör: operator,
 
@@ -77,17 +72,24 @@ function InfoPanel({ port }) {
       anteckningar: notes,
 
       dokument: documents,
+    }
 
-    })
+    try {
+      await updatePort(port.id, values)
 
-    alert('Ändringarna sparades i minnet.')
+      if (onPortSaved) {
+        onPortSaved(port.id, values)
+      }
 
+      alert('Ändringarna sparades permanent.')
+    } catch (error) {
+      console.error(error)
+      alert('Kunde inte spara ändringarna.')
+    }
   }
 
   return (
-
     <aside className="info-panel">
-
       <h2>{port.hamnNamn}</h2>
 
       <p>
@@ -110,9 +112,7 @@ function InfoPanel({ port }) {
       />
 
       {activeTab === 'info' && (
-
         <>
-
           <h3>📍 Grunddata</h3>
 
           <p><strong>GISIS-ID</strong></p>
@@ -152,15 +152,11 @@ function InfoPanel({ port }) {
           <h3>📝 Anteckningar</h3>
 
           <p>{notes || 'Inga anteckningar.'}</p>
-
         </>
-
       )}
 
       {activeTab === 'edit' && (
-
         <EditPanel
-
           isCustomer={isCustomer}
           setIsCustomer={setIsCustomer}
 
@@ -195,13 +191,10 @@ function InfoPanel({ port }) {
           setDocuments={setDocuments}
 
           onSave={saveChanges}
-
         />
-
       )}
 
       {activeTab === 'documents' && (
-
         <>
           <h3>📂 Dokument</h3>
 
@@ -212,11 +205,9 @@ function InfoPanel({ port }) {
               ))
           }
         </>
-
       )}
 
       {activeTab === 'ai' && (
-
         <>
           <h3>🤖 AI-assistent</h3>
 
@@ -231,15 +222,10 @@ function InfoPanel({ port }) {
           <button style={{ width: '100%' }}>
             Kontrollera saknade uppgifter
           </button>
-
         </>
-
       )}
-
     </aside>
-
   )
-
 }
 
 export default InfoPanel

@@ -1,21 +1,32 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import SwedenMap from './components/SwedenMap'
 import InfoPanel from './components/InfoPanel'
 import SearchBox from './components/SearchBox'
-import { getAllPorts } from './services/portService'
+import {
+  loadPorts,
+  getAllPorts,
+  updatePortInMemory,
+} from './services/portService'
 import { normalizeSearch } from './utils/searchUtils'
 import './App.css'
 
-const ports = getAllPorts()
-
-console.log('Alla hamnar:', ports)
-console.log('NCM-kunder:', ports.filter(port => port.ncmKund))
-
 function App() {
+  const [ports, setPorts] = useState([])
+
   const [selectedPort, setSelectedPort] = useState(null)
   const [mapFocusPort, setMapFocusPort] = useState(null)
+
   const [searchText, setSearchText] = useState('')
   const [showOnlyCustomers, setShowOnlyCustomers] = useState(false)
+
+  useEffect(() => {
+    async function init() {
+      await loadPorts()
+      setPorts([...getAllPorts()])
+    }
+
+    init()
+  }, [])
 
   const search = normalizeSearch(searchText)
 
@@ -27,7 +38,8 @@ function App() {
       normalizeSearch(port.operatör).includes(search)
 
     const matchesCustomer =
-      !showOnlyCustomers || port.ncmKund
+      !showOnlyCustomers ||
+      port.ncmKund
 
     return matchesSearch && matchesCustomer
   })
@@ -41,22 +53,34 @@ function App() {
     setSearchText(text)
 
     if (text === '') {
-      setMapFocusPort(null)
       setSelectedPort(null)
+      setMapFocusPort(null)
+    }
+  }
+
+  function handlePortSaved(id, values) {
+    const updatedPort = updatePortInMemory(id, values)
+
+    setPorts([...getAllPorts()])
+
+    if (updatedPort) {
+      setSelectedPort(updatedPort)
+      setMapFocusPort(updatedPort)
     }
   }
 
   const visiblePorts =
     searchText.trim() === ''
-      ? (showOnlyCustomers
-          ? ports.filter((p) => p.ncmKund)
-          : ports)
+      ? (
+          showOnlyCustomers
+            ? ports.filter((p) => p.ncmKund)
+            : ports
+        )
       : filteredPorts
 
   return (
     <main className="app">
       <section className="map-panel">
-
         <div
           style={{
             display: 'flex',
@@ -64,11 +88,19 @@ function App() {
             marginBottom: '10px',
           }}
         >
-          <button onClick={() => setShowOnlyCustomers(false)}>
+          <button
+            onClick={() =>
+              setShowOnlyCustomers(false)
+            }
+          >
             Visa alla
           </button>
 
-          <button onClick={() => setShowOnlyCustomers(true)}>
+          <button
+            onClick={() =>
+              setShowOnlyCustomers(true)
+            }
+          >
             Visa endast NCM-kunder
           </button>
         </div>
@@ -86,11 +118,12 @@ function App() {
           mapFocusPort={mapFocusPort}
           onSelectPort={selectPort}
         />
-
       </section>
 
-      <InfoPanel port={selectedPort} />
-
+      <InfoPanel
+        port={selectedPort}
+        onPortSaved={handlePortSaved}
+      />
     </main>
   )
 }

@@ -1,10 +1,23 @@
 {
   "SEAHU-0001": {
     "ncmKund": true,
-    "operatör": "",
+    "operatör": "Åhus Hamn",
     "latitud": 55.933333,
     "longitud": 14.316667,
-    "pfso": "",
+    "pfso": "Roberto Zigato",
+    "pfsoTelefon": "1234567",
+    "pfsoEmail": "",
+    "pfspInskickad": "2026-08-13",
+    "pfspGodkandTill": "2031-08-12",
+    "anteckningar": "Tillsyn v.41",
+    "dokument": []
+  },
+  "SEKLI-0001": {
+    "ncmKund": true,
+    "operatör": "",
+    "latitud": 57.366667,
+    "longitud": 18.183333,
+    "pfso": "hek",
     "pfsoTelefon": "",
     "pfsoEmail": "",
     "pfspInskickad": "",
