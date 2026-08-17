@@ -18,6 +18,7 @@ function App() {
 
   const [searchText, setSearchText] = useState('')
   const [showOnlyCustomers, setShowOnlyCustomers] = useState(false)
+  const [showSearchControls, setShowSearchControls] = useState(true)
 
   useEffect(() => {
     async function init() {
@@ -47,10 +48,16 @@ function App() {
   function selectPort(port) {
     setSelectedPort(port)
     setMapFocusPort(port)
+    setSearchText('')
+    setShowSearchControls(false)
   }
 
   function updateSearch(text) {
     setSearchText(text)
+
+    if (text !== '') {
+      setShowSearchControls(true)
+    }
 
     if (text === '') {
       setSelectedPort(null)
@@ -81,36 +88,53 @@ function App() {
   return (
     <main className="app">
       <section className="map-panel">
-        <div
-          style={{
-            display: 'flex',
-            gap: '10px',
-            marginBottom: '10px',
-          }}
-        >
+        {showSearchControls ? (
+          <div className="map-top-controls">
+            <SearchBox
+              searchText={searchText}
+              setSearchText={updateSearch}
+              filteredPorts={filteredPorts}
+              onSelectPort={selectPort}
+            />
+
+            <div className="customer-filter">
+              <button
+                className={
+                  !showOnlyCustomers
+                    ? 'filter-button active'
+                    : 'filter-button'
+                }
+                onClick={() =>
+                  setShowOnlyCustomers(false)
+                }
+              >
+                Visa alla
+              </button>
+
+              <button
+                className={
+                  showOnlyCustomers
+                    ? 'filter-button active'
+                    : 'filter-button'
+                }
+                onClick={() =>
+                  setShowOnlyCustomers(true)
+                }
+              >
+                Visa endast NCM-kunder
+              </button>
+            </div>
+          </div>
+        ) : (
           <button
+            className="show-search-button"
             onClick={() =>
-              setShowOnlyCustomers(false)
+              setShowSearchControls(true)
             }
           >
-            Visa alla
+            🔎 Sök / filter
           </button>
-
-          <button
-            onClick={() =>
-              setShowOnlyCustomers(true)
-            }
-          >
-            Visa endast NCM-kunder
-          </button>
-        </div>
-
-        <SearchBox
-          searchText={searchText}
-          setSearchText={updateSearch}
-          filteredPorts={filteredPorts}
-          onSelectPort={selectPort}
-        />
+        )}
 
         <SwedenMap
           ports={visiblePorts}

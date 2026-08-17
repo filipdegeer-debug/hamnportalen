@@ -6,37 +6,38 @@ function SearchBox({
   filteredPorts,
   onSelectPort,
 }) {
+  const showResults =
+    searchText.trim() !== '' &&
+    filteredPorts.length > 0
+
   return (
     <div className="search-box">
       <input
         className="search-input"
         type="text"
-        placeholder="🔍 Sök hamn..."
+        placeholder="Sök hamn, GISIS-ID, operatör..."
         value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
+        onChange={(event) =>
+          setSearchText(event.target.value)
+        }
       />
 
-      {searchText !== '' && (
+      {showResults && (
         <div className="search-results">
-          {filteredPorts.map((port) => (
+          {filteredPorts.slice(0, 25).map((port) => (
             <div
               key={port.id}
               className="search-result"
-              onClick={() => onSelectPort(port)}
+              onClick={() =>
+                onSelectPort(port)
+              }
             >
-              <strong>
-                {port.ncmKund ? '🟢 ' : '🔴 '}
-                {port.hamnNamn}
-              </strong>
-
+              <strong>{port.hamnNamn}</strong>
               <br />
-
-              <small>
+              <span>
                 {port.hamnanlaggningNamn}
-              </small>
-
+              </span>
               <br />
-
               <small>
                 {port.id}
               </small>
